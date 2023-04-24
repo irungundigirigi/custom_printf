@@ -1,17 +1,20 @@
 #include "main.h"
+#include <stdio.h>
 
 /**
  * get_func - returns required function
  * @i: function identifier
  * Return: pointer to required function
  */
+int p;
 
 char* (*get_function(char i))(va_list)
 {
 	int z = 0;
 
 	print keys[] = {
-		{'c', print_c}
+		{'c', print_c},
+		{'s', print_s}
 	};
 
 	while (keys[z].id == i)
@@ -46,7 +49,9 @@ char *create_buffer(void)
  
 void write_buffer(char *buffer, int len, va_list list)
 {
-	write(1, buffer, len);
+	char *b;
 
-	free(buffer); va_end(list);
+	b = realloc(buffer, len);
+	write(1, b, len);
+	free(b); va_end(list);
 }	

@@ -27,7 +27,8 @@ char *print_s(va_list list);
 typedef struct types
 {
 	char id;
+       	/* declaration of fn pointer that takes a single arg of type va_list */
 	char* (*func)(va_list);
-}print;
+}print;	
 
 #endif

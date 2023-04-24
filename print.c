@@ -9,14 +9,16 @@
  */
 
 int buffer_overflow_check(char *buffer, int len)
-{
+{	
 	if (len > 1020)
 	{
 		write(1, buffer, len);
 		len = 0;
 	}
+
 	return (len);
 }
+
 
 /**
  * _printf - mini printf version
@@ -24,15 +26,12 @@ int buffer_overflow_check(char *buffer, int len)
  * Return: expanded string
  */
 
-int _printf(const char * format, ...)
+int _printf(const char *format, ...)
 {
+	int len = 0, full_len = 0, i = 0, j = 0;
 	va_list list;
-	char *buffer;
-	char *str;
-	int len = 0; 
-	int full_len = 0; 
-	int i = 0;
-       	int j = 0;
+	char *buffer, *string;
+
 
 	char* (*f)(va_list);
 
@@ -51,13 +50,14 @@ int _printf(const char * format, ...)
 		if (format[i] != '%')
 		{
 			/* copy format to buffer */
-			len = buffer_overflow_check (buffer, len);
+			len = buffer_overflow_check(buffer, len);
 			buffer[len] = format[i];
-			len++; i++; full_len++;
+			len++; i++;
+			full_len++;
 		}
 		else
 		{
-			i++; /* if % check next character*/
+			i++; /* if % ,check next character to find function */
 
 			if (format[i] == '\0') /* % at end of string*/
 			{
@@ -65,11 +65,12 @@ int _printf(const char * format, ...)
 				free(buffer);
 				return (-1);
 			}
+
 			if (format[i] == '%') /* double % */
 			{
 				len = buffer_overflow_check(buffer, len);
 				buffer[len] = format[i];
-				len++; i++; full_len++;
+				len++;full_len++;
 			}
 			else 
 			{
@@ -78,48 +79,50 @@ int _printf(const char * format, ...)
 				if (f == NULL)
 				{
 					len = buffer_overflow_check(buffer, len);
-					buffer[len] = '%'; full_len++;
-					buffer[len] = format[i]; full_len++;
+					buffer[len] = '%'; full_len++;len++;
+					buffer[len] = format[i]; full_len++;i++;
 				}
 				else
 				{
-					str = f(list);
-					if (str == NULL)
+					string = f(list);
+					if (string == NULL)
 					{
 						va_end(list);
 						free(buffer);
 						return (-1);
 					}	
+				
+					if (format[i] == 'c' && string[0] == '\0')
+					{
+						len = buffer_overflow_check(buffer, len);
+						buffer[len] = '\0';
+						len++;
+						full_len++;
+					}
+					while (string[j] != '\0')
+					{
+						len = buffer_overflow_check(buffer, len);
+						buffer[len] = string[j];
+						len++;
+						full_len++; j++;
+					}
+					free(string);
 				}
-				if (format[i] == 'c' && str[0] == '\0')
-				{
-					len = buffer_overflow_check(buffer, len);
-					buffer[len] = '\0';
-					len++;
-					full_len++;
-				}
-				while (str[j] != '\0')
-				{
-					len = buffer_overflow_check(buffer, len);
-					buffer[len] = str[j];
-					len++;
-					full_len++; j++;
-				}
-				free(str);
+				
 
 			}
+			i++;
 			
-		} i++;
+		}
 			
-	
+		
 	}
-
 	write_buffer(buffer, len, list);
 	return (full_len);	
 }
 
 int main(void)
 {
-	_printf("C");
+	_printf("My name is %s", "marlen");
 	return (0);
 }
